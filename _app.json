@@ -1,0 +1,13 @@
+{
+  "apps" : [
+    {
+      "name" : "ipsy",
+      "script" : "index.js",
+      "error_file" : "./logs/debug.log",
+      "out_file" : "./logs/debug.log",
+      "cwd" : "./",
+      "watch" : false,
+      "kill_timeout" : 3000
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "ipsyholog2bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "konser80",
+  "license": "ISC",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "dayjs": "^1.10.4",
+    "express": "^4.17.1",
+    "google-spreadsheet": "^3.1.15",
+    "node-fetch": "^2.6.1",
+    "node-schedule": "^2.0.0",
+    "notify": "github:konser80/notify",
+    "telegraf": "^4.3.0",
+    "useful": "github:konser80/useful",
+    "validator": "^13.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.26.0",
+    "eslint-plugin-airbnb-base": "*",
+    "eslint-plugin-import": "^2.23.2"
+  }
+}

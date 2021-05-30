@@ -1,8 +1,8 @@
-const express = require('express');
+// const express = require('express');
 const async = require('async');
 const notify = require('notify');
 const config = require('./config');
-const routes = require('./router');
+// const routes = require('./router');
 // const logger = require('./bot/logger');
 const poster = require('./bot/poster');
 const triggers = require('./bot/triggers');
@@ -11,14 +11,14 @@ const bot = require('./bot');
 require('useful');
 
 let data = {};
-let server;
+// let server;
 
 console.log(`[+] production: ${config.isProd}`);
 
 // create server
-const app = express();
-app.use(routes);
-if (config.isProd) app.use(bot.webhookCallback(config.hookPath));
+// const app = express();
+// app.use(routes);
+// if (config.isProd) app.use(bot.webhookCallback(config.hookPath));
 
 // terminate procedures
 process.once('SIGINT', () => shutdown('SIGINT'));
@@ -38,14 +38,14 @@ async.auto({
       return cb();
     });
   },
-  webserver: (cb) => {
-    server = app.listen(config.web_port, config.web_host, () => {
-      console.log(`[+] http start OK, port ${config.web_port}`);
-      cb();
-    });
-  },
+  // webserver: (cb) => {
+  //   server = app.listen(config.web_port, config.web_host, () => {
+  //     console.log(`[+] http start OK, port ${config.web_port}`);
+  //     cb();
+  //   });
+  // },
   loadTriggers: ['importTriggers', 'loadGoogle', (res, cb) => { triggers.loadTriggers(data, cb); }],
-  launchBot: ['loadTriggers', 'loadGoogle', 'webserver', (res, cb) => {
+  launchBot: ['loadTriggers', 'loadGoogle', (res, cb) => {
     // init telegram bot
     bot.init(bot, data);
     // launch
@@ -84,10 +84,10 @@ function shutdown(signal) {
   // console.log(res);
   // process.exit(0);
 
-  server.close((e) => {
-    if (e) console.log(e);
-    console.log('[+] HTTP server closed');
-  });
+  // server.close((e) => {
+  //   if (e) console.log(e);
+  //   console.log('[+] HTTP server closed');
+  // });
   // .then((m) => console.log(`[ ] bot stop: ${m}`))
   // .catch((e) => console.log(`[ ] bot stop error: ${e.message}`));
 

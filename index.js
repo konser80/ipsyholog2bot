@@ -1,8 +1,8 @@
-// const express = require('express');
+const express = require('express');
 const async = require('async');
 const notify = require('notify');
+const routes = require('./router');
 const config = require('./config');
-// const routes = require('./router');
 // const logger = require('./bot/logger');
 const poster = require('./bot/poster');
 const triggers = require('./bot/triggers');
@@ -11,18 +11,10 @@ const bot = require('./bot');
 require('useful');
 
 let data = {};
-// let server;
+let server;
 
 console.log(`[+] production: ${config.isProd}`);
 
-// create server
-// const app = express();
-// app.use(routes);
-// if (config.isProd) app.use(bot.webhookCallback(config.hookPath));
-
-// terminate procedures
-process.once('SIGINT', () => shutdown('SIGINT'));
-process.once('SIGTERM', () => shutdown('SIGTERM'));
 
 // start process
 async.auto({
@@ -38,14 +30,19 @@ async.auto({
       return cb();
     });
   },
-  // webserver: (cb) => {
-  //   server = app.listen(config.web_port, config.web_host, () => {
-  //     console.log(`[+] http start OK, port ${config.web_port}`);
-  //     cb();
-  //   });
-  // },
+  webserver: (cb) => {
+
+    const app = express();
+    app.use(routes);
+    if (config.isProd) app.use(bot.webhookCallback(config.hookPath));
+
+    server = app.listen(config.web_port, config.web_host, () => {
+      console.log(`[+] http start OK, port ${config.web_port}`);
+      cb();
+    });
+  },
   loadTriggers: ['importTriggers', 'loadGoogle', (res, cb) => { triggers.loadTriggers(data, cb); }],
-  launchBot: ['loadTriggers', 'loadGoogle', (res, cb) => {
+  launchBot: ['loadTriggers', 'loadGoogle', 'webserver', (res, cb) => {
     // init telegram bot
     bot.init(bot, data);
     // launch
@@ -74,6 +71,9 @@ async.auto({
   console.log('[+] service started');
 });
 
+// terminate procedures
+process.once('SIGINT', () => shutdown('SIGINT'));
+process.once('SIGTERM', () => shutdown('SIGTERM'));
 
 function shutdown(signal) {
   console.info(`[x] ${signal} signal received`);
@@ -84,15 +84,10 @@ function shutdown(signal) {
   // console.log(res);
   // process.exit(0);
 
-  // server.close((e) => {
-  //   if (e) console.log(e);
-  //   console.log('[+] HTTP server closed');
-  // });
-  // .then((m) => console.log(`[ ] bot stop: ${m}`))
-  // .catch((e) => console.log(`[ ] bot stop error: ${e.message}`));
-
-  // setTimeout(() => {
-  //   console.log('[+] forcefully shutting down');
-  //   process.exit(1);
-  // }, 15000);
+  if (server) {
+    server.close((e) => {
+      if (e) console.log(e);
+      console.log('[+] HTTP server closed');
+    });
+  }
 }

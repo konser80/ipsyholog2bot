@@ -68,13 +68,13 @@ function sheetRead(data, title, callback) {
     .then((rows) => {
       console.debug(`[+] google: read ${title}`);
       callback(null, rows);
-      return;
+      // return;
     })
     .catch((e) => {
       console.log(`[-] google: read ${title} error:`);
       console.error(e);
       callback(e);
-      return;
+      // return;
     });
 }
 

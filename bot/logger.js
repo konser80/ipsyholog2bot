@@ -1,19 +1,8 @@
 const fs = require('fs');
-const config = require('../config');
-// const common = require('../common');
+// const config = require('../config');
 require('useful');
 
 const filename = './data.json';
-// console.debug(ctx.from);
-// console.debug(`[${ctx.from?.id}/${ctx.from?.username}] ${ctx.updateType}.${[ctx.updateSubTypes]} ${ctx.message?.text}`);
-
-// if (ctx.updateType === undefined) {
-//   const fname = './' + dayjs().format('YYYYMMDD-HHmmss') + '.log';
-//   fs.writeFile(fname, util.inspect(ctx, {colors: false, depth: null, showHidden: false}), (err) => {
-//     if (err) { console.error(fname + ' error: ' + err); return; }
-//     console.log(fname + ' created');
-//   })
-// }
 
 function logRequest(ctx, next) {
   // console.debug('some message');
@@ -25,17 +14,11 @@ function logRequest(ctx, next) {
   if (ctx.chat) s += `[${ctx.chat.id}:${ctx.chat.title}]`;
   if (ctx.from) s += `[${ctx.from.id}:${ctx.from.username}]`;
 
-  // if (ctx.message) s += ` ${ctx.message.text}`;
   if (ctx.update[key] && ctx.update[key].text) s += ` ${ctx.update[key].text}`;
   console.debug(s);
 
-  // if (config.debug) {
-  // console.log('== MESSAGE ==');
-  // console.log(ctx.message);
-  // console.log(ctx);
   console.log('== UPDATE ==');
   console.log(ctx.update);
-  // }
 
   return next();
 }

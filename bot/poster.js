@@ -1,6 +1,7 @@
 // const async = require('async');
 const schedule = require('node-schedule');
 const dayjs = require('dayjs');
+const notify = require('notify');
 const config = require('../config');
 // const dateparse = require('dayjs/plugin/customParseFormat');
 require('useful');
@@ -10,7 +11,7 @@ require('useful');
 // ==============================================
 function sendMessage(data, msg, cb) {
 
-  if (!msg.text && !msg.image && !msg.video) {
+  if (!msg.text && !msg.image && !msg.video && !msg.video_note && !msg.voice) {
     console.log('[-] can\'t send empty message');
     return cb && cb('Empty message');
   }
@@ -32,6 +33,7 @@ function sendMessage(data, msg, cb) {
   arrayImages = arrayImages.filter((x) => x.trim() !== '');
 
   // if (config.debug) console.debug(msg);
+  console.debug('sending...');
 
   // photo
   if (msg.image && arrayImages.length === 1) {
@@ -44,9 +46,7 @@ function sendMessage(data, msg, cb) {
         return cb && cb();
       })
       .catch((e) => {
-        console.error(`[-] sendPhoto ${msg.chat_id}: ${e.message}`);
-        console.error(e);
-        return cb && cb(e);
+        checkTelegramAnswer(e, msg, cb);
       });
 
   }
@@ -71,9 +71,7 @@ function sendMessage(data, msg, cb) {
         return cb && cb();
       })
       .catch((e) => {
-        console.error(`[-] sendMedia ${msg.chat_id}: ${e.message}`);
-        console.error(e);
-        return cb && cb(e);
+        checkTelegramAnswer(e, msg, cb);
       });
 
   }
@@ -88,9 +86,7 @@ function sendMessage(data, msg, cb) {
         return cb && cb();
       })
       .catch((e) => {
-        console.error(`[-] sendVideo ${msg.chat_id}: ${e.message}`);
-        console.error(e);
-        return cb && cb(e);
+        checkTelegramAnswer(e, msg, cb);
       });
 
   }
@@ -104,9 +100,7 @@ function sendMessage(data, msg, cb) {
         return cb && cb();
       })
       .catch((e) => {
-        console.error(`[-] sendVideoNote ${msg.chat_id}: ${e.message}`);
-        console.error(e);
-        return cb && cb(e);
+        checkTelegramAnswer(e, msg, cb);
       });
 
   }
@@ -120,9 +114,7 @@ function sendMessage(data, msg, cb) {
         return cb && cb();
       })
       .catch((e) => {
-        console.error(`[-] sendVoice ${msg.chat_id}: ${e.message}`);
-        console.error(e);
-        return cb && cb(e);
+        checkTelegramAnswer(e, msg, cb);
       });
 
   }
@@ -137,9 +129,7 @@ function sendMessage(data, msg, cb) {
         return cb && cb();
       })
       .catch((e) => {
-        console.error(`[-] forwardMessage ${msg.chat_id}: ${e.message}`);
-        console.error(e);
-        return cb && cb(e);
+        checkTelegramAnswer(e, msg, cb);
       });
 
   }
@@ -156,9 +146,7 @@ function sendMessage(data, msg, cb) {
         return cb && cb();
       })
       .catch((e) => {
-        console.error(`[-] sendPoll ${msg.chat_id}: ${e.message}`);
-        console.error(e);
-        return cb && cb(e);
+        checkTelegramAnswer(e, msg, cb);
       });
 
   }
@@ -168,30 +156,44 @@ function sendMessage(data, msg, cb) {
 
     data.bot.telegram.sendMessage(msg.chat_id, msg.text, extra)
       .then(() => {
-        console.debug(`[+] sendMessage OK: ${msg.chat_id}`);
+        console.debug(`[+] msg OK: ${msg.chat_id}`);
         return cb && cb();
       })
       .catch((e) => {
-        console.error(`[-] sendMessage ${msg.chat_id}: ${e.message}`);
-        console.error(e);
-        return cb && cb(e);
+        checkTelegramAnswer(e, msg, cb);
       });
   }
 }
 
 // ==============================================
+function checkTelegramAnswer(result, msg, callback) {
+  if (!result) return callback && callback();
+
+  const errtext = result.message || result;
+
+  console.error(`[-] message ${msg.to}: ${result}`);
+
+  notify(`#error [ipsy] sendmessage: ${msg.to}: ${errtext}`);
+  return callback && callback(errtext);
+}
+
+// ==============================================
 function checkSchedule(data, post) {
-  console.debug('[·] checking schedule');
+  // console.debug('[·] checking schedule');
 
   const startDate = dayjs(`${post.date}T${post.time}:00`);
   const diffDays = parseInt(post.every) || 1;
   const realDiff = Math.round(dayjs().diff(startDate, 'hour')/24);
   const remainder = realDiff % diffDays;
 
-  console.debug(`[·] startDate ${startDate.format()}, diffDays ${diffDays}, realDiff ${realDiff}, remainder ${remainder}`);
-  if (remainder !== 0) return;
+  if (startDate > dayjs()) {
+    console.debug(`[-] startDate ${post.date} ${post.time} is in the future, skipping`);
+    return;
+  }
 
-  console.log('[+] JOB time');
+  if (remainder !== 0) return;
+  console.log(`[+] JOB time @ row ${post.row}`);
+  console.debug(`[·] post date ${startDate.format()}, diff ${diffDays}, realDiff ${realDiff}, remainder ${remainder}`);
 
   if (post.button && post.link) {
     post.extra = {};
@@ -206,24 +208,24 @@ function checkSchedule(data, post) {
   if (post.type && post.id) post[post.type] = post.id;
   // if (config.debug) console.debug(post);
 
-  sendMessage(data, post, (err) => {
-    if (err) return;
+  sendMessage(data, post, () => {
+    // if (err) return;
 
-    const chat = data.chats.find((x) => x.id === post.chat_id);
-    if (!chat) {
-      console.log(`[!] no chat ${post.chat_id} found`);
-      return;
-    }
-
-    chat.last = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    chat.save()
-      .then(() => {
-        console.debug('[+] google: chat saved');
-      })
-      .catch((e) => {
-        console.error('[-] google: chat not saved');
-        console.error(e);
-      });
+    // const chat = data.chats.find((x) => x.id === post.chat_id);
+    // if (!chat) {
+    //   console.log(`[!] no chat ${post.chat_id} found`);
+    //   return;
+    // }
+    //
+    // chat.last = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    // chat.save()
+    //   .then(() => {
+    //     console.debug('[+] google: chat saved');
+    //   })
+    //   .catch((e) => {
+    //     console.error('[-] google: chat not saved');
+    //     console.error(e);
+    //   });
   });
 }
 
@@ -246,13 +248,14 @@ function setSchedules(data) {
   // old jobs?
   cancelSchedules(data);
 
-  postsActive.forEach((post) => {
+  postsActive.forEach((post, idx) => {
     const postHour = parseInt(post.time.substring(0, 2));
     const postMinute = parseInt(post.time.substring(3, 5));
 
     if (postHour >= 0 && postHour <= 23 && postMinute >= 0 && postMinute <= 59) {
       const job = schedule.scheduleJob(
         { hour: postHour, minute: postMinute }, () => {
+          post.row = idx +2;
           checkSchedule(data, post);
         }
       );

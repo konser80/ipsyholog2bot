@@ -1,8 +1,15 @@
 const router = require('express').Router();
+const bodyParser = require('body-parser');
+
+
+// JSON
+router.use(bodyParser.json()); // support json encoded bodies
+router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 // logger
 router.use((req, res, next) => {
-  console.debug(`${req.headers['x-real-ip'] || req.ip} ${req.method} ${req.originalUrl} HTTP/${req.httpVersion} ${req.headers['user-agent']}`);
+  const ip = req.headers['x-real-ip'] || req.ip;
+  console.debug(`${ip} ${req.method} ${req.originalUrl} HTTP/${req.httpVersion} ${req.headers['user-agent']}`);
   next();
 });
 

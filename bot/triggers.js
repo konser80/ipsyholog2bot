@@ -46,7 +46,7 @@ function checkTrigger(ctx, trigger) {
     // console.debug(`result: ${reg_res}, res = ${res}\n`);
   }
 
-  console.debug(`[·] trigger ${trigger.id || ''}: ${res}`);
+  if (res) console.debug(`[+] trigger ${trigger.id || ''}: ${res}`);
   return res;
 }
 // ==============================================
@@ -269,7 +269,8 @@ function importTriggers(data, cb) {
       data.triggers = res;
       console.debug(`[+] triggers read: ${res.length} items`);
       return cb && cb(null, `${res.length} items`);
-    } catch (err) {
+    }
+    catch (err) {
       console.debug(`[+] triggers parse: ${err.message}`);
       return cb && cb(err.message);
     }

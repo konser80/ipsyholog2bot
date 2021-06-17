@@ -17,8 +17,8 @@ function logRequest(ctx, next) {
   if (ctx.update[key] && ctx.update[key].text) s += ` ${ctx.update[key].text}`;
   console.debug(s);
 
-  console.log('== UPDATE ==');
-  console.log(ctx.update);
+  // console.log('== UPDATE ==');
+  // console.log(ctx.update);
 
   return next();
 }

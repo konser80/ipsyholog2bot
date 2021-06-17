@@ -19,10 +19,10 @@ function sendMessage(data, msg, cb) {
     console.log('[-] message is too long');
     return cb && cb('Message is too long');
   }
-  if ((msg.image || msg.video) && msg.text && msg.text.length > 1000) {
-    console.log('[-] caption is too long');
-    return cb && cb('Caption is too long');
-  }
+  // if ((msg.image || msg.video) && msg.text && msg.text.length > 1000) {
+  //   console.log('[-] caption is too long');
+  //   return cb && cb('Caption is too long');
+  // }
 
   const extra = msg.extra || {};
   extra.disable_web_page_preview = msg.preview !== 'TRUE';

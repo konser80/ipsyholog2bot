@@ -66,7 +66,7 @@ function sheetRead(data, title, callback) {
 
   data.doc.sheetsByTitle[title].getRows()
     .then((rows) => {
-      console.debug(`[+] google: read ${title}`);
+      console.debug(`[+] google: read ${title}, items: ${rows.length}`);
       callback(null, rows);
       // return;
     })

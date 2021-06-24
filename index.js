@@ -25,8 +25,8 @@ async.auto({
         console.error(`[-] load google data: ${e.message}`);
         return cb(e);
       }
-      console.log('[+] google: OK');
       data = Object.assign(data, res);
+      console.log(`[+] google: OK, chats:${data.chats.length}, posts: ${data.posts.length}`);
       return cb();
     });
   },

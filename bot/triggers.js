@@ -110,16 +110,17 @@ function doTriggerAction(ctx, trigger, data) {
 
     if (item.action === 'reloadgoogle') {
 
-      common.loadData(['posts'], (e, res) => {
+      common.loadData(['posts', 'chats'], (e, res) => {
         if (e) {
           console.error(`[-] load google data: ${e.message}`);
           ctx.reply(`[-] load google data: ${e.message}`);
           return;
         }
         data.posts = res.posts;
+        data.chats = res.chats;
 
         const reply = poster.setSchedules(data);
-        msg.text = `google load OK, total posts: ${data.posts.length}, active: ${reply}`;
+        msg.text = `google load OK, chats: ${data.chats.length}, total posts: ${data.posts.length}, active: ${reply}`;
         console.log(`[+] ${msg.text}`);
         poster.sendMessage(data, msg);
       });

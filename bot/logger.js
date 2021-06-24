@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const fs = require('fs');
 // const config = require('../config');
 require('useful');
@@ -12,7 +13,7 @@ function logRequest(ctx, next) {
   let s = `<${ctx.updateType}> `;
 
   if (ctx.chat) s += `[${ctx.chat.id}:${ctx.chat.title}]`;
-  if (ctx.from) s += `[${ctx.from.id}:${ctx.from.username}]`;
+  if (ctx.from) s += `[${ctx.from.id}:${ctx.from.username || ''}:${ctx.from.first_name}]`;
 
   if (ctx.update[key] && ctx.update[key].text) s += ` ${ctx.update[key].text}`;
   console.debug(s);
@@ -38,8 +39,15 @@ function addChat(ctx, cb, data) {
 
   if (_chat === undefined && ctx.chat.type !== 'private') {
     console.log(`[+] new chat: ${ctx.chat.id} (${ctx.chat.type}), title: ${ctx.chat.title}, username: ${ctx.chat.username}`);
+    const row = {
+      title: ctx.chat.title,
+      type: ctx.chat.type,
+      username: ctx.chat.username,
+      id: ctx.chat.id,
+      date: dayjs().format(),
+    };
 
-    data.doc.sheetsByTitle.chats.addRow(ctx.chat)
+    data.doc.sheetsByTitle.chats.addRow(row)
       .then((newrow) => {
         data.chats.push(newrow);
         console.debug('[+] new chat saved to googlesheet');

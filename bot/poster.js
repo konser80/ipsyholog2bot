@@ -243,12 +243,14 @@ function cancelSchedules(data) {
 function setSchedules(data) {
 
   let cntok = 0;
-  const postsActive = data.posts.filter((x) => x.on === 'TRUE');
+  // const postsActive = data.posts.filter((x) => x.on === 'TRUE');
 
   // old jobs?
   cancelSchedules(data);
 
-  postsActive.forEach((post, idx) => {
+  data.posts.forEach((post, idx) => {
+    if (post.on !== 'TRUE') return;
+
     const postHour = parseInt(post.time.substring(0, 2));
     const postMinute = parseInt(post.time.substring(3, 5));
 

@@ -5,6 +5,7 @@ const routes = require('./router');
 const config = require('./config');
 // const logger = require('./bot/logger');
 const poster = require('./bot/poster');
+const finances = require('./bot/finances');
 const triggers = require('./bot/triggers');
 const common = require('./common');
 const bot = require('./bot');
@@ -30,6 +31,7 @@ async.auto({
       return cb();
     });
   },
+  inits: (cb) => { finances.init(cb); },
   webserver: (cb) => {
 
     const app = express();

@@ -4,6 +4,8 @@ const fetch = require('node-fetch');
 const config = require('../config');
 const common = require('../common');
 const poster = require('./poster');
+const finances = require('./finances');
+
 require('useful');
 
 const FILENAME = 'triggers.json';
@@ -140,6 +142,9 @@ function doTriggerAction(ctx, trigger, data) {
         poster.sendMessage(data, msg);
       });
     }
+
+    if (item.action === 'finance_add') finances.tgmessage(data, ctx);
+    if (item.action === 'finance_reload') finances.reload(data, ctx);
 
     if (item.url && item.url !== '') {
       const url = pathReplace(ctx.update, item.url);
